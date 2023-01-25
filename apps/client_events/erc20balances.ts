@@ -18,7 +18,10 @@ export function erc20balances() {
   redisRead.on("message", async (_, message) => {
     const { wallet, contractAddress } = JSON.parse(message) as MessageData;
 
-    const result = await redisWrite.set(`${contractAddress}-${wallet}`, JSON.stringify(message));
+    const result = await redisWrite.set(
+      `${contractAddress}-${wallet}`,
+      JSON.stringify(message)
+    );
 
     console.info(result);
   });
