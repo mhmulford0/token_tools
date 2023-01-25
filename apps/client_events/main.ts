@@ -1,13 +1,9 @@
-import { Queue } from "bullmq";
-
-const myQueue = new Queue("foo");
-
-async function addJobs() {
-  await myQueue.add("myJobName", { foo: "bar" });
-  await myQueue.add("myJobName", { qux: "baz" });
-}
+import { subscriber } from "./sub";
 
 async function start() {
-  await addJobs();
+  subscriber();
 }
-start();
+start().catch((err) => {
+  console.log(err)
+  process.exit(1);
+});

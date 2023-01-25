@@ -12,6 +12,7 @@ import { ERC20ABI } from "@/core/abis/ERC20";
 import { ethers } from "ethers";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { redis } from "@/core/server/redis";
 
 const provider = new ethers.providers.AlchemyProvider("homestead", process.env.ALCHEMY_API_KEY);
 
@@ -29,14 +30,31 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     match(req.method)
       .with("GET", async () => {
         try {
+          const info = await redis.get(`${contractAddress}-${wallet}`);
+          if (info) {
+            console.log(JSON.parse(info));
+            return res.status(200).send(JSON.parse(info));
+          }
+
           const balance = await ERC20.balanceOf(wallet);
           const decimals: number = await ERC20.decimals();
           const name: string = await ERC20.name();
           const symbol: string = await ERC20.symbol();
           const formattedBalance = ethers.utils.formatUnits(balance, decimals);
-
+          redis.publish(
+            "erc20balances",
+            JSON.stringify({
+              balance: formattedBalance,
+              decimals,
+              name,
+              symbol,
+              wallet,
+              contractAddress,
+            })
+          );
           return res.status(200).json({ balance: formattedBalance, decimals, name, symbol });
         } catch (error) {
+          console.log(error);
           res.status(500).json({ error });
         }
       })
