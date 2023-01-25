@@ -30,10 +30,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     match(req.method)
       .with("GET", async () => {
         try {
-          const info = await redis.get(`${contractAddress}-${wallet}`);
-          if (info) {
-            console.log(JSON.parse(info));
-            return res.status(200).send(JSON.parse(info));
+          const cachedTokenInfo = await redis.get(`${contractAddress}-${wallet}`);
+          if (cachedTokenInfo) {
+            console.log(JSON.parse(cachedTokenInfo));
+            return res.status(200).send(JSON.parse(cachedTokenInfo));
           }
 
           const balance = await ERC20.balanceOf(wallet);
