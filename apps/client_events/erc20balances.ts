@@ -2,8 +2,8 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import Redis from "ioredis";
-export const redisRead = new Redis(process.env.CONNECTION_STRING as string);
-export const redisWrite = new Redis(process.env.CONNECTION_STRING as string);
+const redisRead = new Redis(process.env.CONNECTION_STRING as string);
+const redisWrite = new Redis(process.env.CONNECTION_STRING as string);
 
 type MessageData = {
   wallet: string;
@@ -20,7 +20,9 @@ export function erc20balances() {
 
     const result = await redisWrite.set(
       `${contractAddress}-${wallet}`,
-      JSON.stringify(message)
+      JSON.stringify(message),
+      "EX",
+      900
     );
 
     console.info(result);
