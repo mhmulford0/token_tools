@@ -59,7 +59,7 @@ export default function AddressInput({ checkTokenBalance }: Props) {
 
           <div>
             <label htmlFor="contractAddress" className="block font-medium text-gray-700 mt-4">
-              Contract Address
+              <h3>Contract Address</h3>
             </label>
             <div className="mt-1">
               <input
