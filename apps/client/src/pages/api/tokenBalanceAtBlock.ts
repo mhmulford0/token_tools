@@ -14,7 +14,10 @@ import { match } from "ts-pattern";
 import { z } from "zod";
 import { redis } from "@/core/server/redis";
 
-const provider = new ethers.providers.AlchemyProvider("homestead", process.env.ALCHEMY_API_KEY);
+const provider = new ethers.providers.AlchemyProvider(
+  "homestead",
+  process.env.ALCHEMY_API_KEY
+);
 
 const reqInfo = z.object({
   wallet: z.string().length(42).startsWith("0x"),
@@ -36,10 +39,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             return res.status(200).send(JSON.parse(cachedTokenInfo));
           }
 
-          const balance = await ERC20.balanceOf(wallet);
-          const decimals: number = await ERC20.decimals();
-          const name: string = await ERC20.name();
-          const symbol: string = await ERC20.symbol();
+          const [balance, decimals, name, symbol] = await Promise.all([
+            ERC20.balanceOf(wallet),
+            ERC20.decimals(),
+            ERC20.name(),
+            ERC20.symbol(),
+          ]);
           const formattedBalance = ethers.utils.formatUnits(balance, decimals);
           redis.publish(
             "erc20balances",
