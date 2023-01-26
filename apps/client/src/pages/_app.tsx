@@ -12,7 +12,10 @@ import Layout from "@/components/layout";
 
 const { chains, provider } = configureChains(
   [mainnet],
-  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "" }), publicProvider()]
+  [
+    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "" }),
+    publicProvider(),
+  ]
 );
 
 const { connectors } = getDefaultWallets({
@@ -29,11 +32,9 @@ const wagmiClient = createClient({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </RainbowKitProvider>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     </WagmiConfig>
   );
 }

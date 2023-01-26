@@ -8,8 +8,14 @@ import { ethers } from "ethers";
 
 import { z } from "zod";
 import Redis from "ioredis";
+import cors from "@fastify/cors";
 
 const server: FastifyInstance = Fastify({});
+
+server.register(cors, {
+  methods: ["GET", "POST"],
+  origin: "*"
+});
 
 const redis = new Redis(process.env.CONNECTION_STRING as string);
 

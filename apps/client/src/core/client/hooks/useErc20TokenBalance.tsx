@@ -5,7 +5,6 @@ import { useAccount } from "wagmi";
 export default function useErc20TokenBalance() {
   const { address } = useAccount();
 
-
   const [apiData, setApiData] = useState<ApiResponse>({
     balance: "",
     decimals: "",
@@ -19,14 +18,14 @@ export default function useErc20TokenBalance() {
       throw Error("IMPLEMENT ERROR HANDLING");
     }
     const res = await fetch(
-      `/api/tokenBalanceAtBlock?${new URLSearchParams({
+      `http://localhost:3001/erc20balances?${new URLSearchParams({
         wallet: address,
         contractAddress: contractAddress,
       })}`
     );
     const data: ApiResponse = await res.json();
 
-    console.log(data)
+    console.log(data);
 
     setApiData({ ...data, wallet: address });
   }

@@ -1,6 +1,6 @@
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import ConnectWalletButton from "./ConnectWalletButton";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { classNames } from "@/core/client/classNames";
@@ -9,8 +9,6 @@ const navigation = [
   { name: "Home", href: "/" },
   { name: "ERC 20 Balance", href: "/erc20", current: true },
 ];
-
-
 
 export default function Navbar() {
   const router = useRouter();
@@ -65,9 +63,7 @@ export default function Navbar() {
                   </div>
                 </div>
               </div>
-              <div className="absolute inset-y-0 right-0 sm:flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 hidden">
-                <ConnectWalletButton />
-              </div>
+              <div className="absolute inset-y-0 right-0 sm:flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 hidden"></div>
             </div>
           </div>
 
@@ -89,7 +85,6 @@ export default function Navbar() {
                   {item.name}
                 </Disclosure.Button>
               ))}
-              <ConnectWalletButton />
             </div>
           </Disclosure.Panel>
         </>
