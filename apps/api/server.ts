@@ -72,7 +72,7 @@ server.get("/erc20balances", async (req, res) => {
 
 const start = async () => {
   try {
-    await server.listen({ port: 3001 });
+    await server.listen({ host: "0.0.0.0", port: parseInt(process.env.PORT as string) });
 
     const address = server.server.address();
     const port = typeof address === "string" ? address : address?.port;
