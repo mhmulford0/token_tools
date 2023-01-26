@@ -5,7 +5,7 @@ export default function ERC20TokenInfo(props: { apiData: ApiResponse }) {
   const { address } = useAccount();
   const { name, symbol, balance, wallet } = props.apiData;
   return (
-    <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="sm:mx-auto sm:w-full sm:max-w-md prose prose-sm">
       <div className="overflow-hidden bg-white shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6">
           <h3 className="text-lg font-medium leading-6 text-gray-900">Token Information</h3>

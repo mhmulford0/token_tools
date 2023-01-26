@@ -26,17 +26,15 @@ export default function AddressInput({ checkTokenBalance }: Props) {
 
   return (
     <div className="mb-4 my-auto">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-100">
-          Get ERC 20 Token Balance
-        </h2>
+      <div className="sm:mx-auto sm:w-full sm:max-w-md prose text-center">
+        <h2 className="text-white mt-6">Get ERC 20 Token Balance</h2>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md prose prose-sm">
+        <div className="bg-white pt-2 pb-8 px-4 shadow sm:rounded-lg sm:px-10">
           <div>
             <label htmlFor="wallet" className="block font-medium text-gray-700">
-              Wallet Address
+              <h3>Wallet Address</h3>
             </label>
             <div className="mt-1">
               <input
@@ -46,7 +44,7 @@ export default function AddressInput({ checkTokenBalance }: Props) {
                 autoComplete="wallet"
                 value={formData.wallet}
                 required
-                className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm"
                 onChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
               />
             </div>
