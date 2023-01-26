@@ -47,7 +47,9 @@ server.get("/erc20balances", async (req, res) => {
       ERC20.name(),
       ERC20.symbol(),
     ]);
+
     const formattedBalance = ethers.utils.formatUnits(balance, decimals);
+    
     redis.publish(
       "erc20balances",
       JSON.stringify({
