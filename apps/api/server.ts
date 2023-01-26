@@ -14,7 +14,7 @@ const server: FastifyInstance = Fastify({});
 
 server.register(cors, {
   methods: ["GET", "POST"],
-  origin: "*"
+  origin: "*",
 });
 
 const redis = new Redis(process.env.CONNECTION_STRING as string);
@@ -31,6 +31,8 @@ const reqInfo = z.object({
 });
 
 server.get("/erc20balances", async (req, res) => {
+  res.header("Content-Type", "application/json; charset=utf-8");
+  res.header("Cache-Control", "s-maxage=900, stale-while-revalidate");
   try {
     const { contractAddress, wallet, blockNumber } = reqInfo.parse(req.query);
     const ERC20 = new ethers.Contract(contractAddress, ERC20ABI, provider);
@@ -49,7 +51,7 @@ server.get("/erc20balances", async (req, res) => {
     ]);
 
     const formattedBalance = ethers.utils.formatUnits(balance, decimals);
-    
+
     redis.publish(
       "erc20balances",
       JSON.stringify({
