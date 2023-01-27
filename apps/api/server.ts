@@ -7,8 +7,8 @@ import { ERC20ABI } from "./core/ERC20";
 import { ethers } from "ethers";
 
 import { z } from "zod";
-import Redis from "ioredis";
 import cors from "@fastify/cors";
+import { provider, redisRead, redisWrite } from "./core/utils";
 
 const server: FastifyInstance = Fastify({});
 
@@ -16,13 +16,6 @@ server.register(cors, {
   methods: ["GET", "POST"],
   origin: "*",
 });
-
-const redis = new Redis(process.env.CONNECTION_STRING as string);
-
-const provider = new ethers.providers.AlchemyProvider(
-  "homestead",
-  process.env.ALCHEMY_API_KEY
-);
 
 const reqInfo = z.object({
   wallet: z.string().length(42).startsWith("0x"),
@@ -37,7 +30,7 @@ server.get("/erc20balances", async (req, res) => {
     const { contractAddress, wallet, blockNumber } = reqInfo.parse(req.query);
     const ERC20 = new ethers.Contract(contractAddress, ERC20ABI, provider);
 
-    const cachedTokenInfo = await redis.get(`${contractAddress}-${wallet}`);
+    const cachedTokenInfo = await redisRead.get(`${contractAddress}-${wallet}`);
     if (cachedTokenInfo) {
       console.log(JSON.parse(cachedTokenInfo));
       return res.status(200).send(JSON.parse(cachedTokenInfo));
@@ -52,7 +45,7 @@ server.get("/erc20balances", async (req, res) => {
 
     const formattedBalance = ethers.utils.formatUnits(balance, decimals);
 
-    redis.publish(
+    redisWrite.publish(
       "erc20balances",
       JSON.stringify({
         balance: formattedBalance,
@@ -72,11 +65,15 @@ server.get("/erc20balances", async (req, res) => {
 
 const start = async () => {
   try {
-    await server.listen({ host: "0.0.0.0", port: parseInt(process.env.PORT as string) });
+    await server.listen({
+      host: "0.0.0.0",
+      port: parseInt(process.env.PORT as string) || 3001,
+    });
 
     const address = server.server.address();
     const port = typeof address === "string" ? address : address?.port;
   } catch (err) {
+    console.log(err);
     server.log.error(err);
     process.exit(1);
   }
