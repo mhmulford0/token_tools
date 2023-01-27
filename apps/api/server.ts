@@ -2,13 +2,9 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import Fastify, { FastifyInstance } from "fastify";
-import { ERC20ABI } from "./core/ERC20";
 
-import { ethers } from "ethers";
-
-import { z } from "zod";
 import cors from "@fastify/cors";
-import { provider, redisRead, redisWrite } from "./core/utils";
+import { erc20Router } from "./routes/erc20";
 
 const server: FastifyInstance = Fastify({});
 
@@ -17,51 +13,8 @@ server.register(cors, {
   origin: "*",
 });
 
-const reqInfo = z.object({
-  wallet: z.string().length(42).startsWith("0x"),
-  contractAddress: z.string().length(42).startsWith("0x"),
-  blockNumber: z.coerce.number().optional(),
-});
-
-server.get("/erc20balances", async (req, res) => {
-  res.header("Content-Type", "application/json; charset=utf-8");
-  res.header("Cache-Control", "s-maxage=900, stale-while-revalidate");
-  try {
-    const { contractAddress, wallet, blockNumber } = reqInfo.parse(req.query);
-    const ERC20 = new ethers.Contract(contractAddress, ERC20ABI, provider);
-
-    const cachedTokenInfo = await redisRead.get(`${contractAddress}-${wallet}`);
-    if (cachedTokenInfo) {
-      console.log(JSON.parse(cachedTokenInfo));
-      return res.status(200).send(JSON.parse(cachedTokenInfo));
-    }
-
-    const [balance, decimals, name, symbol] = await Promise.all([
-      ERC20.balanceOf(wallet),
-      ERC20.decimals(),
-      ERC20.name(),
-      ERC20.symbol(),
-    ]);
-
-    const formattedBalance = ethers.utils.formatUnits(balance, decimals);
-
-    redisWrite.publish(
-      "erc20balances",
-      JSON.stringify({
-        balance: formattedBalance,
-        decimals,
-        name,
-        symbol,
-        wallet,
-        contractAddress,
-      })
-    );
-    return res.status(200).send({ balance: formattedBalance, decimals, name, symbol });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({ error });
-  }
-});
+// routes
+server.register(erc20Router);
 
 const start = async () => {
   try {
