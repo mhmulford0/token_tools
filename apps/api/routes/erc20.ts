@@ -9,8 +9,8 @@ import { z } from "zod";
 export async function erc20Router(fastify: FastifyInstance) {
   fastify.get("/erc20balances", async (req, res) => {
     res.header("Content-Type", "application/json; charset=utf-8");
-    res.header("Cache-Control", "s-maxage=900, stale-while-revalidate");
     try {
+      res.header("Cache-Control", "s-maxage=900, stale-while-revalidate");
       const reqInfo = z.object({
         wallet: z.string().length(42).startsWith("0x"),
         contractAddress: z.string().length(42).startsWith("0x"),
@@ -26,11 +26,12 @@ export async function erc20Router(fastify: FastifyInstance) {
         return res.status(200).send(JSON.parse(cachedTokenInfo));
       }
 
-      const [balance, decimals, name, symbol] = await Promise.all([
+      const [balance, decimals, name, symbol, totalSupply] = await Promise.all([
         ERC20.balanceOf(wallet),
         ERC20.decimals(),
         ERC20.name(),
         ERC20.symbol(),
+        ERC20.totalSupply(),
       ]);
 
       const formattedBalance = ethers.utils.formatUnits(balance, decimals);
