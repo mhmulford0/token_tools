@@ -68,25 +68,25 @@ export async function erc20Router(fastify: FastifyInstance) {
       fromBlock: 15390081,
       toBlock: 16502028,
     };
-    setTimeout(() => {
-      // Retrieve past logs for the "Transfer" event
-      provider.getLogs(filter).then((logs) => {
-        // Create a set to store unique addresses
-        const addresses = new Set();
+    // setTimeout(() => {
+    //   // Retrieve past logs for the "Transfer" event
+    //   provider.getLogs(filter).then((logs) => {
+    //     // Create a set to store unique addresses
+    //     const addresses = new Set();
 
-        // Iterate through the logs and add the from and to addresses to the set
-        logs.map((log) => {
-          // console.log(log);
-          const event = new ethers.utils.Interface(ERC20ABI).parseLog(log);
-          // addresses.add(event.name);
-          // addresses.add(event.args);
+    //     // Iterate through the logs and add the from and to addresses to the set
+    //     logs.map((log) => {
+    //       // console.log(log);
+    //       const event = new ethers.utils.Interface(ERC20ABI).parseLog(log);
+    //       // addresses.add(event.name);
+    //       // addresses.add(event.args);
 
-          console.log(event);
-        });
+    //       console.log(event);
+    //     });
 
-        console.log(Array.from(addresses));
-      });
-    }, 250);
+    //     console.log(Array.from(addresses));
+    //   });
+    // }, 250);
 
     return res.status(200).send("")
   });
