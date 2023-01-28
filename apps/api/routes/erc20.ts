@@ -21,10 +21,10 @@ export async function erc20Router(fastify: FastifyInstance) {
       const ERC20 = new ethers.Contract(contractAddress, ERC20ABI, provider);
 
       const cachedTokenInfo = await redisRead.get(`${contractAddress}-${wallet}`);
-      if (cachedTokenInfo) {
-        console.log(JSON.parse(cachedTokenInfo));
-        return res.status(200).send(JSON.parse(cachedTokenInfo));
-      }
+      // if (cachedTokenInfo) {
+      //   console.log(JSON.parse(cachedTokenInfo));
+      //   return res.status(200).send(JSON.parse(cachedTokenInfo));
+      // }
 
       const [balance, decimals, name, symbol, totalSupply] = await Promise.all([
         ERC20.balanceOf(wallet),
@@ -47,10 +47,47 @@ export async function erc20Router(fastify: FastifyInstance) {
           contractAddress,
         })
       );
+
       return res.status(200).send({ balance: formattedBalance, decimals, name, symbol });
     } catch (error) {
       console.log(error);
       res.status(500).send({ error });
     }
+  });
+
+  fastify.get("/erc20snapshot", (req, res) => {
+    const reqInfo = z.object({
+      contractAddress: z.string().length(42).startsWith("0x"),
+      blockNumber: z.coerce.number(),
+    });
+    const { contractAddress, blockNumber } = reqInfo.parse(req.query);
+
+    const filter = {
+      address: contractAddress,
+      topics: [ethers.utils.id("Transfer(address,address,uint256)")],
+      fromBlock: 15390081,
+      toBlock: 16502028,
+    };
+    setTimeout(() => {
+      // Retrieve past logs for the "Transfer" event
+      provider.getLogs(filter).then((logs) => {
+        // Create a set to store unique addresses
+        const addresses = new Set();
+
+        // Iterate through the logs and add the from and to addresses to the set
+        logs.map((log) => {
+          // console.log(log);
+          const event = new ethers.utils.Interface(ERC20ABI).parseLog(log);
+          // addresses.add(event.name);
+          // addresses.add(event.args);
+
+          console.log(event);
+        });
+
+        console.log(Array.from(addresses));
+      });
+    }, 250);
+
+    return res.status(200).send("")
   });
 }
