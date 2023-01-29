@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 
 import { z } from "zod";
 
-export async function erc20Router(fastify: FastifyInstance) {
+export default async function erc20Router(fastify: FastifyInstance) {
   fastify.get("/erc20balances", async (req, res) => {
     res.header("Content-Type", "application/json; charset=utf-8");
     try {
@@ -20,11 +20,11 @@ export async function erc20Router(fastify: FastifyInstance) {
       const { contractAddress, wallet, blockNumber } = reqInfo.parse(req.query);
       const ERC20 = new ethers.Contract(contractAddress, ERC20ABI, provider);
 
-      const cachedTokenInfo = await redisRead.get(`${contractAddress}-${wallet}`);
-      // if (cachedTokenInfo) {
-      //   console.log(JSON.parse(cachedTokenInfo));
-      //   return res.status(200).send(JSON.parse(cachedTokenInfo));
-      // }
+      const cachedTokenInfo = await redisRead.get(`erc20-${contractAddress}-${wallet}`);
+      if (cachedTokenInfo) {
+        console.log(JSON.parse(cachedTokenInfo));
+        return res.status(200).send(JSON.parse(cachedTokenInfo));
+      }
 
       const [balance, decimals, name, symbol, totalSupply] = await Promise.all([
         ERC20.balanceOf(wallet),

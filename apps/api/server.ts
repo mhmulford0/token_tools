@@ -4,7 +4,8 @@ dotenv.config();
 import Fastify, { FastifyInstance } from "fastify";
 
 import cors from "@fastify/cors";
-import { erc20Router } from "./routes/erc20";
+import erc20Router from "./routes/erc20";
+import erc721Router from "./routes/erc721";
 
 const server: FastifyInstance = Fastify({});
 
@@ -15,6 +16,7 @@ server.register(cors, {
 
 // routes
 server.register(erc20Router);
+server.register(erc721Router);
 
 const start = async () => {
   try {
